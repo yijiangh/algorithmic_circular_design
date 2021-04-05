@@ -102,27 +102,44 @@ $ python
 1.0
 ```
 
-<details><summary>the step above should look at the following in your terminal:</summary>
+<details><summary>the step above should look at the following in your Julia terminal:</summary>
 
 ![pyjulia_success](images/pyjulia_success.png)
 
 </details>
 
-Now you are done :tada:! Open the Grasshopper script `Geodesic_Reuse_v2.gh` with the Rhino file `sample house_r6_3.3dm`, and the julia backend should be working now!
+The downloading and precompilation will likely take a while (~4 mins). 
+
+But now you are done :tada:! Open the Grasshopper script `Geodesic_Reuse_v2.gh` with the Rhino file `sample house_r6_3.3dm`, and the julia backend should be working now!
 
 ## Solving Mixed-Integer Programming with `JuMP` and `Gurobi`
 
 With the help of [JuMP.jl](https://github.com/jump-dev/JuMP.jl), we can easily replicate the MILP formulation using use the Gurobi optimizer, as proposed in [[Brütting et al. 2020]](https://www.frontiersin.org/articles/10.3389/fbuil.2020.00057/full#B6). 
 
-Gurobi is a fairly expensive commerical optimization software, but we can obtain free academic licenses [here](https://www.gurobi.com/academia/academic-program-and-licenses/).
+### Obtain the academic Gurobi license
 
-To do this, We need to install a few more julia packages:
+Gurobi is a fairly expensive commerical optimization software, but we can obtain free academic licenses [here](https://www.gurobi.com/academia/academic-program-and-licenses/).
+Follow instructions in the `Individual Academic Licenses` section, and make sure that you did the last step on `grbgetkey `.
+
+### Install additional Julia packages
+
+We need to install a few more julia packages for optimization. Launch Julia command prompt by searching for julia in your search bar:
+
+![pyjulia_success](images/julia_terminal.png)
+
+Then, issue `]` to enter the [package manager mode](https://pkgdocs.julialang.org/v1/getting-started/#Basic-Usage),
+and install the required packages:
 
 ```julia
 # type in "]"
 julia>]
 (@v1.6) pkg> add LinearAlgebra JuMP Gurobi
-...
 ```
+
+<details><summary>the step above should look at the following in your terminal:</summary>
+
+![julia_pkg](images/julia_package_install.png)
+
+</details>
 
 Wait for the installation to finish, and we should be able to use their power in Grasshopper!
