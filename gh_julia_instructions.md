@@ -7,27 +7,18 @@ The instructions below walks you through setting up the julia backend.
 0. Operating System: **Windows 10**
 
 1. [Rhinoceros 3D >=6.0](https://www.rhino3d.com/):
-
     We will use Rhino / Grasshopper as a frontend for inputting
     geometric and numeric paramters, and use various C#/julia packages as the computing backends.
-
-2. [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
-
+2. [Miniconda](https://docs.conda.io/en/latest/miniconda.html):
     We will install all the required python packages using 
     `Miniconda` (a light version of Anaconda). Miniconda uses 
     **environments** to create isolated spaces for projects' 
     depedencies.
-
-3. [Julia>=1.6](https://julialang.org/downloads/).
-
+3. [Julia>=1.6](https://julialang.org/downloads/):
     Please download installer from the stable release `v1.6.0`.
-
-4. [GHPythonRemote](https://github.com/pilcru/ghpythonremote).
-
+4. [GHPythonRemote](https://github.com/pilcru/ghpythonremote):
     Main package that allows us to call external python packages within the GHPython environment.
-
 5. [pyjulia](https://github.com/JuliaPy/pyjulia):
-
     Main package that allows us to call Julia from python.
 
 Now, please click on the links above to install `1-3` (`Rhino`, `Miniconda`, and `Julia`).
@@ -80,9 +71,28 @@ python -m ghpythonremote._configure_ironpython_installation 6
 If the installation went smoothly, you should see something like this:
 ![ghpythonremote_success](images/ghpythonremote_success.png)
 
-### `pyjulia` installation 
+### Installing Julia
 
-:construction: Please make sure that you've installed Julia from [here](https://julialang.org/downloads/) before you proceed on this step.
+Please make sure that you've installed Julia from [here](https://julialang.org/downloads/) before you proceed on the next step.
+
+**Don't forget to enable the `Add Julia to environment path` in the installation!**
+
+<details><summary>If you forget to do add Julia to path during the installation, you can do it by...</summary>
+
+First find where your `julia.exe` executable resides. The easy way is to first type in `julia` in your search bar, and click `open file location`:
+
+![julia search bar](images/julia_search_bar.png)
+
+Then, right-click on the shortcut and click `open file location`. This will lead you to the path where julia is installed - it usually looks something like `C:\Users\<User name>\AppData\Local\Programs\Julia-1.6.0-rc1\bin`.
+
+![julia find location](images/julia_find_location.png)
+
+Copy that file path and then follow [these instructions](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/) to add it to the environment path.
+
+</details>
+
+
+### `pyjulia` installation 
 
 Keep using the anaconda terminal, issue the following to install
 `pyjulia`:
@@ -114,7 +124,7 @@ But now you are done :tada:! Open the Grasshopper script `Geodesic_Reuse_v2.gh` 
 
 ## Solving Mixed-Integer Programming with `JuMP` and `Gurobi`
 
-With the help of [JuMP.jl](https://github.com/jump-dev/JuMP.jl), we can easily replicate the MILP formulation using use the Gurobi optimizer, as proposed in [[Brütting et al. 2020]](https://www.frontiersin.org/articles/10.3389/fbuil.2020.00057/full#B6). 
+With the help of [JuMP.jl](https://github.com/jump-dev/JuMP.jl), we can easily replicate the MILP formulation using use the Gurobi optimizer, as proposed in [[Brütting et al. 2020]](https://www.frontiersin.org/articles/10.3389/fbuil.2020.00057/full). 
 
 ### Obtain the academic Gurobi license
 

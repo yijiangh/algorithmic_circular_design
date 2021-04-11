@@ -10,9 +10,13 @@ This repo contains two different implementations to use the [Hungarian algorithm
 
 The C# implementation requires no extra effort to setup, simply open the Grasshopper script `Geodesic_Reuse_v2.gh` with the Rhino file `sample house_r6_3.3dm`, and it works out of the box!
 
+TODO:
+The grasshopper script needs the [RhinoPolyhedron]() plugin to work.
+
 To use the julia backend, however, we need some extra setup, but it's worth the effort - we've reported at least 10 times speedup with the julia backend compared to the C# one!
 
 The instructions for setting up the GH-Julia workflow is [here](./gh_julia_instructions.md).
+
 
 ## Citation
 
