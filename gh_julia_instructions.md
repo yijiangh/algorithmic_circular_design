@@ -141,7 +141,7 @@ and install the required packages:
 ```julia
 # type in "]"
 julia>]
-(@v1.6) pkg> add LinearAlgebra JuMP Gurobi
+(@v1.6) pkg> add LinearAlgebra JuMP GLPK
 ```
 
 <details><summary>the step above should look at the following in your terminal:</summary>

@@ -1,13 +1,16 @@
 using JuMP
-# using GLPK
-# using Cbc
-using Gurobi
 using LinearAlgebra
 
-function solve_lp_assignment_problem(costMat::AbstractMatrix; optimizer=Gurobi.Optimizer, verbose=false, binary_var=false)
-    rowNum, colNum = size(costMat)
-    # currently, the function `hungarian` automatically transposes `cost matrix` when there are more workers than jobs.
-    costMatrix = rowNum ≤ colNum ? costMat : copy(transpose(costMat))
+# * Free and open-source solvers
+using GLPK
+# using Cbc
+# * Commercial solvers
+# using Gurobi
+
+function solve_lp_assignment_problem(costMatrix::AbstractMatrix; optimizer=GLPK.Optimizer, verbose=false, 
+		binary_var=false, category=Nothing)
+    rowNum, colNum = size(costMatrix)
+	@assert rowNum <= colNum "Inventory size is smaller than the design set size. Inventory size must be larger."
 
 	# Preparing an optimization model
 	m = Model(optimizer)
@@ -19,20 +22,35 @@ function solve_lp_assignment_problem(costMat::AbstractMatrix; optimizer=Gurobi.O
 	# https://nbviewer.jupyter.org/github/jump-dev/JuMPTutorials.jl/blob/master/notebook/modelling/network_flows.ipynb
 	# Declaring variables
 	if !binary_var
-		@variable(m, 0 <= x[1:rowNum, 1:colNum] <= 1)
+		m[:x] = @variable(m, 0 <= x[1:rowNum, 1:colNum] <= 1)
 	else
-		@variable(m, x[1:rowNum, 1:colNum], Bin)
+		m[:x] = @variable(m, x[1:rowNum, 1:colNum], Bin)
 	end
 
 	# Setting the objective
 	@objective(m, Min, dot(costMatrix, x))
 
 	# Adding constraints
-	@constraint(m, [i = 1:rowNum], sum(x[i, :]) == 1)
+	# * each design unit must be matched with a inventory unit
+	m[:design] = @constraint(m, [i = 1:rowNum], sum(x[i, :]) == 1)
+
+	# * each inventory unit can be used at most once
 	if rowNum == colNum
-		@constraint(m, [j = 1:colNum], sum(x[:, j]) == 1)
+		# * one-to-one match
+		m[:inventory_eq] = @constraint(m, [j = 1:colNum], sum(x[:, j]) == 1)
 	else
-		@constraint(m, [j = 1:colNum], sum(x[:, j]) <= 1)
+		m[:inventory_ineq] = @constraint(m, [j = 1:colNum], sum(x[:, j]) <= 1)
+	end
+
+	# * additional categorical constraint
+	if category isa Vector
+		# ! check one-based indexing
+		@assert all(map(v->all(v .>= 1), category))
+		m[:inventory_category] = @constraint(m, [k = 1:length(category)], sum(sum(x[:, j]) for j in category[k]) <= 1)
+	elseif category isa Matrix
+		# ! pycall convert non-ragged vector of vectors into a matrix...
+		@assert all(category .>= 1)
+		m[:inventory_category] = @constraint(m, [k = 1:size(category, 1)], sum(sum(x[:, j]) for j in category[k,:]) <= 1)
 	end
 
 	#  the optimization problem
@@ -44,6 +62,7 @@ function solve_lp_assignment_problem(costMat::AbstractMatrix; optimizer=Gurobi.O
 	    x_opt = value.(x)
 	    cost = objective_value(m)
 		println("The model terminates due to time limits.")
+	    error("The model terminates due to time limits.")
 	else
 	    error("The model was not solved correctly.")
 	end
@@ -52,16 +71,11 @@ function solve_lp_assignment_problem(costMat::AbstractMatrix; optimizer=Gurobi.O
     for i = 1:rowNum
 		for j =1:colNum
         	if x_opt[i, j] ≈ 1.0
-        	    if rowNum ≤ colNum
         	        assignment[i] = j
-        	    else
-        	        assignment[j] = i
-        	    end
-				break
         	end
 		end
     end
-    return assignment, cost
+    return assignment, cost, m
 end
 
 function solve_upcycling_assignment(design_lengths::AbstractVector, inventory_lengths::AbstractVector,
